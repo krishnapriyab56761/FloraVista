@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+  </header>
+
+  <!-- Add Plant Section -->
+  <section>
+    <h2>Add Plant</h2>
+    <form id="addPlantForm">
+      <input type="text" name="name" placeholder="Plant Name" required>
+      <input type="text" name="category" placeholder="Category" required>
+      <input type="text" name="care" placeholder="Care Instructions" required>
+      <input type="number" name="price" placeholder="Price" required>
+      <input type="number" name="stock" placeholder="Stock" required>
+      <button type="submit">Add Plant</button>
+    </form>
+  </section>
+
+  <!-- Orders Section -->
+  <section>
+    <h2>Orders</h2>
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Email</th>
+          <th>Plant</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <script>
+    const PLANTS_API = "http://localhost:5000/plants";
+    const ORDERS_API = "http://localhost:5000/orders";
+
+    // -------------------------------
+    // Add Plant
+    // -------------------------------
+    document.getElementById('addPlantForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(e.target).entries());
+
+      try {
+        const res = await fetch(PLANTS_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const data = await res.json();
+        alert(data.message);
+        e.target.reset();
+      } catch (err) {
+        console.error(err);
+        alert("Error adding plant");
+      }
+    });
+
+    // -------------------------------
+    // Load Orders
+    // -------------------------------
+    async function loadOrders() {
+      try {
+        const res = await fetch(ORDERS_API);
+        const orders = await res.json();
+
+        const tbody = document.querySelector('#ordersTable tbody');
+        tbody.innerHTML = "";
+
+        orders.forEach(order => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${order.customerName || '-'}</td>
+            <td>${order.email || '-'}</td>
+            <td>${order.plantId?.name || 'Unknown Plant'}</td>
+            <td>${order.quantity || '-'}</td>
+            <td>${order.status}</td>
+            <td>
+              <button class="complete-btn" data-id="${order._id}">Order placed</button>
+              <button class="delete-btn" data-id="${order._id}">order deleted</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error(err);
+        alert("Error loading orders");
+      }
+    }
+
+    // -------------------------------
+    // Handle Actions (Complete/Delete)
+    // -------------------------------
+    document.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('complete-btn')) {
+        const id = e.target.dataset.id;
+        await fetch(`${ORDERS_API}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'Completed' })
+        });
+        loadOrders(); // refresh table
+      }
+
+      if (e.target.classList.contains('delete-btn')) {
+        const id = e.target.dataset.id;
+        await fetch(`${ORDERS_API}/${id}`, { method: 'DELETE' });
+        loadOrders(); // refresh table
+      }
+    });
+
+    // Initial load
+    loadOrders();
+  </script>
+</body>
+</html>

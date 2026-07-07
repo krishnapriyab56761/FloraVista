@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Catalog - FloraVista</title>
+  <link rel="stylesheet" href="catalog.css">
+</head>
+<body>
+  <header>
+  <h1>Our plant Catalog</h1>
+  <p><b>Browse our beautiful collection</b></p>
+  <p>Bringing nature closer to you.</p>
+</header>
+
+<nav>
+  <a href="index.html" class="active">Home</a>
+ 
+  
+</nav>
+
+ <section class="catalog" id="plants"></section>
+
+<script>
+  fetch('http://localhost:5000/plants')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('plants');
+      container.innerHTML = ""; // clear old content
+
+      data.forEach(p => {
+  const card = document.createElement('div');
+  card.className = "card";
+  card.innerHTML = `
+    <h2>${p.name}</h2>
+    <p>Category: ${p.category}</p>
+    <p>CareGuide: ${p.careGuide}</p>
+    <p class="price">₹${p.price}</p>
+    <p class="stock ${p.stock > 0 ? 'in-stock' : 'out-stock'}">
+      ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
+    </p>
+    <button class="order-btn" data-id="${p._id}">Order Now</button>
+  `;
+  container.appendChild(card);
+});
+
+    })
+    .catch(err => console.error(err));
+</script>
+<script src="script.js"></script>
+<script>document.addEventListener('click', e => {
+  if (e.target.classList.contains('order-btn')) {
+    const plantId = e.target.getAttribute('data-id');
+    const orderData = {
+      customerName: prompt("Enter your name"),
+      email: prompt("Enter your email"),
+      quantity: prompt("enter the quantity:"),
+      plantId: plantId,
+      
+    };
+
+    fetch('http://localhost:5000/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message))
+    .catch(err => console.error(err));
+  }
+});
+
+</script>
+<section class="catalog" id="plants"></section>
+
+<div style="text-align:center; margin: 20px;">
+  <button id="loadMore" class="more-btn">More Collection</button>
+</div>
+
+<script>
+function loadPlants(url) {
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('plants');
+      container.innerHTML = "";
+
+      data.forEach(p => {
+        const card = document.createElement('div');
+        card.className = "card";
+        card.innerHTML = `
+          <h2>${p.name}</h2>
+          <p>Category: ${p.category}</p>
+          <p>CareGuide: ${p.careGuide}</p>
+          <p class="price">₹${p.price}</p>
+          <p class="stock ${p.stock > 0 ? 'in-stock' : 'out-stock'}">
+            ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
+          </p>
+          <button class="order-btn" data-id="${p._id}">Order Now</button>
+        `;
+        container.appendChild(card);
+      });
+    })
+    .catch(err => console.error(err));
+}
+
+// Load first 15 on page load
+loadPlants('http://localhost:5000/plants');
+
+// Load all when button clicked
+document.getElementById('loadMore').addEventListener('click', () => {
+  loadPlants('http://localhost:5000/plants/all');
+});
+</script>
+
+<footer>
+  © 2026 FloraVista Nursery
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,177 @@
+
+1. Admin Adds a Plant
+Open admin.html in your browser.
+
+Fill in the form (e.g., Name: Aloe Vera, Category: Medicinal, Price: 120, Stock: 15).
+
+Submit → backend saves it in MongoDB (plants collection).
+
+You should see the new plant appear in the admin list.
+
+2. Catalog Shows Plant
+Open catalog.html.
+
+The new plant (Aloe Vera) should now appear alongside Rose, Tulip, Jasmine, etc.
+
+This confirms frontend → backend → database connection is working.
+
+3. Customer Adds to Cart
+Click Add to Cart on Aloe Vera.
+
+A popup alert confirms it’s added.
+
+Cart data is stored in localStorage.
+
+4. Cart Page Displays Items
+Open cart.html.
+
+You should see Aloe Vera listed with its price.
+
+Total is calculated automatically.
+
+5. Checkout
+Click Checkout.
+
+The cart data is sent to backend (/orders route).
+
+Backend saves it in MongoDB (orders collection).
+
+You’ll see an alert: “Order placed successfully!”
+
+Cart clears from localStorage.
+
+6. Verify in MongoDB Compass
+Open Compass → nursery database → orders collection.
+
+You should see a new document:
+
+json
+{
+  "items": [
+    { "id": "plantId", "name": "Aloe Vera", "price": 120 }
+  ],
+  "total": 120,
+  "date": "2026-06-27T..."
+}
+✅ If all these steps succeed, your project is fully functional:
+
+Admin can manage plants.
+
+Customers can browse, add to cart, and checkout.
+
+Orders are saved in the database.
+
+
+
+
+app.get('/plants', async (req, res) => {
+  const plants = await Plant.find().limit(15);
+  res.json(plants);
+});
+
+
+sevr.json
+const express = require('express');
+
+const cors = require('cors');
+
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://127.0.0.1:27017/plantNursery')
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.error('❌ MongoDB connection error:', err))
+
+
+// Models
+const Plant = require('./models/Plant');
+const Order = require('./models/Order');
+
+// Routes
+// First 15 items
+app.get('/plants', async (req, res) => {
+  const plants = await Plant.find().limit(15);
+  res.json(plants);
+});
+
+// All items
+app.get('/plants/all', async (req, res) => {
+  const plants = await Plant.find();
+  res.json(plants);
+});
+
+
+app.post('/plants', async (req, res) => {
+  // Admin-only route (later add authentication)
+  const plant = new Plant(req.body);
+  await plant.save();
+  res.json({ message: "Plant added successfully!" });
+});
+
+app.post('/order', async (req, res) => {
+  const order = new Order(req.body);
+  await order.save();
+  res.json({ message: "Order placed successfully!" });
+});
+
+app.get("/orders", async (req, res) => {
+    try {
+        const orders = await Order.find().populate("plantId"); 
+        res.json(orders);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+// Approve order
+app.put('/orders/:id/approve', async (req, res) => {
+  await Order.findByIdAndUpdate(req.params.id, { status: "Approved" });
+  res.json({ message: "Order approved" });
+});
+
+// Reject order
+app.put('/orders/:id/reject', async (req, res) => {
+  await Order.findByIdAndUpdate(req.params.id, { status: "Rejected" });
+  res.json({ message: "Order rejected" });
+});
+// Update order status
+app.put("/orders/:id", async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    );
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete order
+app.delete("/orders/:id", async (req, res) => {
+  try {
+    await Order.findByIdAndDelete(req.params.id);
+    res.json({ message: "Order deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+app.listen(5000, () => console.log("Server running on port 5000"));
+
+//all data
+// server.js
+app.get('/plants/all', async (req, res) => {
+  try {
+    const plants = await Plant.find(); // fetch all items
+    res.json(plants);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});

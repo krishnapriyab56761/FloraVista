@@ -1,0 +1,168 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(90deg, #06af5b, #0c7f83);
+  color: #333;
+}
+
+
+header {
+  background-color: #176f3a;
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+header h1 {
+  font-size: 2.5em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+header h1::before {
+  
+  font-size: 1.2em;
+}
+
+header p {
+  font-size: 1.1em;
+  margin-top: 10px;
+}
+
+/* 🌿 Navigation */
+nav {
+  background-color: #116423;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px 0;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+nav a:hover {
+  background-color: #14894f;
+}
+
+nav a.active {
+  background-color: #105c10;
+  color: #eef5ee;
+}
+
+/* 🌼 Catalog Grid */
+.catalog {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 50px 20px;
+}
+
+/* 🌱 Plant Card */
+.card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 280px;
+  padding: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.card h2 {
+  color: #333;
+  font-size: 1.4em;
+  margin-bottom: 10px;
+}
+
+.card p {
+  margin: 6px 0;
+  font-size: 0.95em;
+}
+
+/* 💰 Price */
+.price {
+  color: #2e7d32;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* 🏷️ Stock Status */
+.stock {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.in-stock {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.out-stock {
+  background-color: #0a6641;
+  color: #28c6a4;
+}
+
+/* 🌻 Footer */
+footer {
+  background-color: #16e145;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9em;
+}
+
+.order-btn {
+  background-color: #43a047;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 10px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.order-btn:hover {
+  background-color: #2e7d32;
+  transform: scale(1.05);
+}
+.more-btn {
+  background-color: #ff7043;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.more-btn:hover {
+  background-color: #e64a19;
+  transform: scale(1.05);
+}
